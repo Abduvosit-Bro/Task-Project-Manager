@@ -4,6 +4,8 @@ from apps.tasks.models import Task
 from apps.events.models import CalendarEvent
 
 
+from apps.projects.models import ProjectMember, Project
+
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
@@ -67,5 +69,33 @@ class NotificationDetailSerializer(serializers.ModelSerializer):
                     'name_ja': event.project.name_ja,
                     'name_uz': event.project.name_uz,
                 },
+            }
+        if obj.entity_type == 'project_member':
+            try:
+                member = ProjectMember.objects.select_related('project', 'user').get(id=obj.entity_id)
+            except ProjectMember.DoesNotExist:
+                return None
+            return {
+                'id': member.id,
+                'status': member.status,
+                'project': {
+                    'id': member.project.id,
+                    'name_ja': member.project.name_ja,
+                    'name_uz': member.project.name_uz,
+                },
+                'user': {
+                    'id': member.user.id,
+                    'display_name': member.user.display_name,
+                }
+            }
+        if obj.entity_type == 'project':
+            try:
+                project = Project.objects.get(id=obj.entity_id)
+            except Project.DoesNotExist:
+                return None
+            return {
+                'id': project.id,
+                'name_ja': project.name_ja,
+                'name_uz': project.name_uz,
             }
         return None

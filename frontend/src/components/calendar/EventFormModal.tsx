@@ -125,7 +125,7 @@ const EventFormModal = ({
           </div>
         </div>
         <div className="flex justify-between">
-          <button className="text-sm text-teal" onClick={handleTranslate}>
+          <button type="button" className="text-sm text-teal" onClick={handleTranslate}>
             {t('autoTranslate')}
           </button>
           <div className="flex gap-2">

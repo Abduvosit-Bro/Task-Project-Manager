@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useProjects } from '../../hooks/useProjects'
 import { useTranslation } from 'react-i18next'
 import { pickLocalized } from '../../utils/i18nHelpers'
-import { LayoutDashboard, Bell, Settings, FolderKanban } from 'lucide-react'
+import { LayoutDashboard, Bell, Settings, FolderKanban, Calendar } from 'lucide-react'
 
 const Sidebar = () => {
   const { t, i18n } = useTranslation()
@@ -46,6 +46,17 @@ const Sidebar = () => {
         >
           <FolderKanban className="w-4 h-4" />
           {t('projects')}
+        </Link>
+        <Link
+          to="/app/calendar"
+          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+            location.pathname === '/app/calendar'
+              ? 'bg-teal/10 text-teal dark:bg-teal/20'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-ink dark:hover:text-slate-200'
+          }`}
+        >
+          <Calendar className="w-4 h-4" />
+          {t('calendar')}
         </Link>
       </nav>
 

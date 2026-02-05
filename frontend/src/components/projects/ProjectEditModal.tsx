@@ -7,7 +7,7 @@ import { translateText } from '../../api/translate'
 
 const ProjectEditModal = ({ open, onClose, onSave, initialData }: { open: boolean; onClose: () => void; onSave: (payload: any) => void; initialData: any }) => {
   const { t } = useTranslation()
-  const [form, setForm] = useState({ name_ja: '', name_uz: '', description_ja: '', description_uz: '' })
+  const [form, setForm] = useState({ name_ja: '', name_uz: '', description_ja: '', description_uz: '', subject_ja: '', subject_uz: '', is_public: true })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -18,6 +18,9 @@ const ProjectEditModal = ({ open, onClose, onSave, initialData }: { open: boolea
         name_uz: initialData.name_uz || '',
         description_ja: initialData.description_ja || '',
         description_uz: initialData.description_uz || '',
+        subject_ja: initialData.subject_ja || '',
+        subject_uz: initialData.subject_uz || '',
+        is_public: initialData.is_public !== undefined ? initialData.is_public : true,
       })
     }
   }, [initialData])
@@ -39,6 +42,14 @@ const ProjectEditModal = ({ open, onClose, onSave, initialData }: { open: boolea
     if (form.description_uz && !form.description_ja) {
       const res = await translateText({ source_lang: 'uz', target_lang: 'ja', text: form.description_uz })
       updates.description_ja = res.translated_text
+    }
+    if (form.subject_ja && !form.subject_uz) {
+      const res = await translateText({ source_lang: 'ja', target_lang: 'uz', text: form.subject_ja })
+      updates.subject_uz = res.translated_text
+    }
+    if (form.subject_uz && !form.subject_ja) {
+      const res = await translateText({ source_lang: 'uz', target_lang: 'ja', text: form.subject_uz })
+      updates.subject_ja = res.translated_text
     }
     setForm(updates)
   }
@@ -70,8 +81,21 @@ const ProjectEditModal = ({ open, onClose, onSave, initialData }: { open: boolea
         <Input placeholder={t('nameUz')} value={form.name_uz} onChange={(e) => setForm({ ...form, name_uz: e.target.value })} />
         <Input placeholder={t('descriptionJa')} value={form.description_ja} onChange={(e) => setForm({ ...form, description_ja: e.target.value })} />
         <Input placeholder={t('descriptionUz')} value={form.description_uz} onChange={(e) => setForm({ ...form, description_uz: e.target.value })} />
+        <Input placeholder={t('subjectJa')} value={form.subject_ja} onChange={(e) => setForm({ ...form, subject_ja: e.target.value })} />
+        <Input placeholder={t('subjectUz')} value={form.subject_uz} onChange={(e) => setForm({ ...form, subject_uz: e.target.value })} />
+        
+        <label className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={form.is_public}
+            onChange={(e) => setForm({ ...form, is_public: e.target.checked })}
+            className="rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+          />
+          <span className="text-sm text-gray-700 dark:text-gray-300">{t('publicProject')}</span>
+        </label>
+
         <div className="flex justify-between">
-          <button className="text-sm text-teal" onClick={handleTranslate}>
+          <button type="button" className="text-sm text-teal" onClick={handleTranslate}>
             {t('autoTranslate')}
           </button>
           <div className="flex gap-2">

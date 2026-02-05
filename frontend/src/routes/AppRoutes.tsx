@@ -42,6 +42,7 @@ const AppRoutes = () => (
       <Route path="projects" element={<ProjectsPage />} />
       <Route path="projects/:id/tasks" element={<TasksPage />} />
       <Route path="projects/:id/calendar" element={<CalendarPage />} />
+      <Route path="calendar" element={<CalendarPage />} />
       <Route path="notifications" element={<NotificationsPage />} />
       <Route path="settings" element={<SettingsPage />} />
     </Route>

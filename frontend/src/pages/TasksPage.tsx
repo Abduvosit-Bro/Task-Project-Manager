@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQueryClient, useQuery } from '@tanstack/react-query'
 import TaskList from '../components/tasks/TaskList'
 import TaskFilters from '../components/tasks/TaskFilters'
 import TaskFormModal from '../components/tasks/TaskFormModal'
@@ -9,12 +9,24 @@ import TaskDetailsModal from '../components/tasks/TaskDetailsModal'
 import Button from '../components/ui/Button'
 import { useTasks } from '../hooks/useTasks'
 import { createTask, updateTask, deleteTask } from '../api/tasks'
+import { fetchProject, joinProject } from '../api/projects'
+import { useAuth } from '../hooks/useAuth'
 
 const TasksPage = () => {
   const { t } = useTranslation()
+  const { user } = useAuth()
   const { id } = useParams()
   const [filters, setFilters] = useState({ status: '', priority: '', tag: '' })
   const { data: tasks = [], isLoading } = useTasks(id || '', filters)
+  
+  const { data: project } = useQuery({
+    queryKey: ['project', id],
+    queryFn: () => fetchProject(Number(id)),
+    enabled: !!id
+  })
+
+  const isProjectOwner = project?.owner === user?.id
+
   const [open, setOpen] = useState(false)
   const [selectedTask, setSelectedTask] = useState<any>(null)
   const [detailsOpen, setDetailsOpen] = useState(false)
@@ -42,11 +54,32 @@ const TasksPage = () => {
     await queryClient.invalidateQueries({ queryKey: ['tasks', id] })
   }
 
+  const handleJoin = async () => {
+    if (!id) return
+    try {
+      await joinProject(Number(id))
+      alert(t('joinRequestSent'))
+      queryClient.invalidateQueries({ queryKey: ['project', id] })
+    } catch (error) {
+      console.error(error)
+      alert(t('joinRequestFailed'))
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold text-ink dark:text-white">{t('tasks')}</h2>
-        <Button onClick={() => setOpen(true)}>{t('newTask')}</Button>
+        {isProjectOwner ? (
+          <Button onClick={() => setOpen(true)}>{t('newTask')}</Button>
+        ) : project?.is_member ? (
+           // Member but not owner - cannot create tasks
+           null 
+        ) : project?.member_status === 'pending' ? (
+          <Button disabled className="bg-gray-400 cursor-not-allowed">{t('requestPending')}</Button>
+        ) : (
+          <Button onClick={handleJoin}>{t('joinProject')}</Button>
+        )}
       </div>
       <TaskFilters filters={filters} onChange={setFilters} />
       {isLoading ? (
@@ -58,7 +91,7 @@ const TasksPage = () => {
             setSelectedTask(task)
             setDetailsOpen(true)
           }}
-          onDelete={handleDelete}
+          onDelete={isProjectOwner ? (id) => { void handleDelete(id) } : undefined}
         />
       )}
       <TaskFormModal open={open} onClose={() => setOpen(false)} onSave={handleCreate} title={t('newTask')} />
@@ -69,6 +102,7 @@ const TasksPage = () => {
           setSelectedTask(null)
         }}
         task={selectedTask}
+        readOnly={!isProjectOwner}
         onEdit={() => {
           setDetailsOpen(false)
           setEditOpen(true)

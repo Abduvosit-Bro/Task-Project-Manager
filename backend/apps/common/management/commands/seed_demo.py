@@ -1,4 +1,4 @@
-﻿from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from apps.projects.models import Project, ProjectMember
@@ -38,12 +38,12 @@ class Command(BaseCommand):
         tag2, _ = Tag.objects.get_or_create(owner=user, name='Muhim')
 
         task = Task.objects.create(
-            project=project,
             created_by=user,
             title_ja='最初のタスク',
             title_uz='Birinchi vazifa',
             due_at=timezone.now() + timezone.timedelta(days=1),
         )
+        task.projects.add(project)
         task.tags.set([tag1, tag2])
 
         event = CalendarEvent.objects.create(

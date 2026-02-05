@@ -36,11 +36,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         void i18n.changeLanguage(data.preferred_language)
         localStorage.setItem('ui_language', data.preferred_language)
       }
-    } catch (error) {
-      // Clear tokens if request fails (user not authenticated)
-      setUser(null)
-      localStorage.removeItem('access_token')
-      localStorage.removeItem('refresh_token')
+    } catch (error: any) {
+      // Only clear tokens if it's an authentication error
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        setUser(null)
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('refresh_token')
+      }
+      // For other errors (network, 500), keep the tokens to retry later
     }
   }
 

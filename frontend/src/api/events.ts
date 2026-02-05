@@ -23,7 +23,10 @@ export const fetchEvent = async (eventId: number) => {
   return data
 }
 
-export const fetchCalendar = async (projectId: string, params?: Record<string, string>) => {
-  const { data } = await api.get(`/projects/${projectId}/calendar/`, { params })
+export const fetchCalendar = async (projectId?: string, params?: Record<string, string>) => {
+  const url = projectId 
+    ? `/projects/${projectId}/calendar/` 
+    : '/calendar/global/'
+  const { data } = await api.get(url, { params })
   return data
 }

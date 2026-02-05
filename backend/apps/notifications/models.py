@@ -8,10 +8,15 @@ class Notification(TimeStampedModel):
     TYPE_CHOICES = (
         ('due_soon', 'Due Soon'),
         ('event_soon', 'Event Soon'),
+        ('join_request', 'Join Request'),
+        ('project_join_approved', 'Project Join Approved'),
+        ('project_join_rejected', 'Project Join Rejected'),
     )
     ENTITY_CHOICES = (
         ('task', 'Task'),
         ('event', 'Event'),
+        ('project', 'Project'),
+        ('project_member', 'Project Member'),
     )
     CHANNEL_CHOICES = (
         ('in_app', 'In App'),

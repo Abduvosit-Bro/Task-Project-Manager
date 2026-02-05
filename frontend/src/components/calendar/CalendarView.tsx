@@ -10,7 +10,7 @@ import { pickLocalized } from '../../utils/i18nHelpers'
 import EventFormModal from './EventFormModal'
 import TaskFormModal from '../tasks/TaskFormModal'
 
-const CalendarView = ({ projectId, refreshKey }: { projectId: string; refreshKey: number }) => {
+const CalendarView = ({ projectId, refreshKey }: { projectId?: string; refreshKey: number }) => {
   const { i18n } = useTranslation()
   const [events, setEvents] = useState<any[]>([])
   const [selectedTask, setSelectedTask] = useState<any | null>(null)
@@ -20,7 +20,6 @@ const CalendarView = ({ projectId, refreshKey }: { projectId: string; refreshKey
   const [refreshInternal, setRefreshInternal] = useState(0)
 
   useEffect(() => {
-    if (!projectId) return
     const load = async () => {
       const data = await fetchCalendar(projectId)
       const lang = i18n.language as 'ja' | 'uz'
@@ -30,6 +29,13 @@ const CalendarView = ({ projectId, refreshKey }: { projectId: string; refreshKey
         start: item.start,
         end: item.end,
         allDay: item.allDay,
+        backgroundColor: item.project_color || '#3b82f6',
+        borderColor: item.project_color || '#3b82f6',
+        extendedProps: {
+          project_name_ja: item.project_name_ja,
+          project_name_uz: item.project_name_uz,
+          project_color: item.project_color
+        }
       }))
       setEvents(mapped)
     }

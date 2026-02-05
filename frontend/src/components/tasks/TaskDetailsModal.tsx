@@ -9,9 +9,10 @@ interface TaskDetailsModalProps {
   onClose: () => void
   task: any
   onEdit: () => void
+  readOnly?: boolean
 }
 
-const TaskDetailsModal = ({ open, onClose, task, onEdit }: TaskDetailsModalProps) => {
+const TaskDetailsModal = ({ open, onClose, task, onEdit, readOnly = false }: TaskDetailsModalProps) => {
   const { t, i18n } = useTranslation()
   const lang = i18n.language as 'ja' | 'uz'
 
@@ -35,7 +36,7 @@ const TaskDetailsModal = ({ open, onClose, task, onEdit }: TaskDetailsModalProps
         </div>
 
         <div>
-          <div className="text-xs text-gray-500 uppercase">{t('projects') || 'Projects'}</div>
+          <div className="text-xs text-gray-500 uppercase">{t('projects')}</div>
           <div className="flex flex-wrap gap-2 mt-1">
             {task.projects_detail && task.projects_detail.length > 0 ? (
               task.projects_detail.map((proj: any) => (
@@ -79,9 +80,11 @@ const TaskDetailsModal = ({ open, onClose, task, onEdit }: TaskDetailsModalProps
           <Button className="bg-gray-200 text-gray-700" onClick={onClose}>
             {t('close')}
           </Button>
-          <Button onClick={() => { onClose(); onEdit(); }}>
-            {t('edit')}
-          </Button>
+          {!readOnly && (
+            <Button onClick={() => { onClose(); onEdit(); }}>
+              {t('edit')}
+            </Button>
+          )}
         </div>
       </div>
     </Modal>

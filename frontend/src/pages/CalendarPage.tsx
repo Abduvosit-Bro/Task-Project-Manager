@@ -22,9 +22,9 @@ const CalendarPage = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold text-ink dark:text-white">{t('calendar')}</h2>
-        <Button onClick={() => setOpen(true)}>{t('newEvent')}</Button>
+        {id && <Button onClick={() => setOpen(true)}>{t('newEvent')}</Button>}
       </div>
-      {id && <CalendarView projectId={id} refreshKey={refreshKey} />}
+      <CalendarView projectId={id} refreshKey={refreshKey} />
       <EventFormModal open={open} onClose={() => setOpen(false)} onSave={handleCreate} />
     </div>
   )

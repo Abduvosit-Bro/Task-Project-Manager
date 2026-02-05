@@ -1,0 +1,18 @@
+cd "C:\Users\User\Desktop\Task&Project Manager\backend"
+.\.venv\Scripts\activate
+python manage.py runserver
+
+
+cd "C:\Users\User\Desktop\Task&Project Manager\backend"
+.\.venv\Scripts\activate
+celery -A config.celery worker -l info -P solo -c 1
+
+
+cd "C:\Users\User\Desktop\Task&Project Manager\backend"
+.\.venv\Scripts\activate
+celery -A config.celery beat -l info
+
+
+cd "C:\Users\User\Desktop\Task&Project Manager\frontend"
+npm run dev
+

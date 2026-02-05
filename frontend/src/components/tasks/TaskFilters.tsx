@@ -11,6 +11,26 @@ interface TaskFiltersProps {
 const TaskFilters = ({ filters, onChange }: TaskFiltersProps) => {
   const { t } = useTranslation()
   const { data: tags = [] } = useQuery({ queryKey: ['tags'], queryFn: fetchTags })
+
+  const statusOptions = [
+    { value: '', label: '-' },
+    { value: 'todo', label: 'todo' },
+    { value: 'in_progress', label: 'in_progress' },
+    { value: 'done', label: 'done' },
+  ]
+
+  const priorityOptions = [
+    { value: '', label: '-' },
+    { value: 'low', label: 'low' },
+    { value: 'medium', label: 'medium' },
+    { value: 'high', label: 'high' },
+  ]
+
+  const tagOptions = [
+    { value: '', label: '-' },
+    ...tags.map((tag: any) => ({ value: tag.id, label: tag.name }))
+  ]
+
   return (
     <div className="flex gap-4 w-full">
       <div className="flex flex-col gap-1 flex-1">
@@ -19,13 +39,9 @@ const TaskFilters = ({ filters, onChange }: TaskFiltersProps) => {
         </label>
         <Select
           value={filters.status}
-          onChange={(e) => onChange({ ...filters, status: e.target.value })}
-        >
-          <option value="">-</option>
-          <option value="todo">todo</option>
-          <option value="in_progress">in_progress</option>
-          <option value="done">done</option>
-        </Select>
+          onChange={(val) => onChange({ ...filters, status: val })}
+          options={statusOptions}
+        />
       </div>
 
       <div className="flex flex-col gap-1 flex-1">
@@ -34,13 +50,9 @@ const TaskFilters = ({ filters, onChange }: TaskFiltersProps) => {
         </label>
         <Select
           value={filters.priority}
-          onChange={(e) => onChange({ ...filters, priority: e.target.value })}
-        >
-          <option value="">-</option>
-          <option value="low">low</option>
-          <option value="medium">medium</option>
-          <option value="high">high</option>
-        </Select>
+          onChange={(val) => onChange({ ...filters, priority: val })}
+          options={priorityOptions}
+        />
       </div>
 
       <div className="flex flex-col gap-1 flex-1">
@@ -49,15 +61,9 @@ const TaskFilters = ({ filters, onChange }: TaskFiltersProps) => {
         </label>
         <Select
           value={filters.tag || ''}
-          onChange={(e) => onChange({ ...filters, tag: e.target.value })}
-        >
-          <option value="">-</option>
-          {tags.map((tag: any) => (
-            <option key={tag.id} value={tag.id}>
-              {tag.name}
-            </option>
-          ))}
-        </Select>
+          onChange={(val) => onChange({ ...filters, tag: val })}
+          options={tagOptions}
+        />
       </div>
     </div>
   )

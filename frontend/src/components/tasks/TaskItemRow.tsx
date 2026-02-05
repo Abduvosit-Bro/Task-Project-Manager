@@ -3,7 +3,7 @@ import { pickLocalized } from '../../utils/i18nHelpers'
 import { useTranslation } from 'react-i18next'
 import { Calendar, CheckCircle2, Circle } from 'lucide-react'
 
-const TaskItemRow = ({ task, onClick, onDelete }: { task: any; onClick: () => void; onDelete: () => void }) => {
+const TaskItemRow = ({ task, onClick, onDelete }: { task: any; onClick: () => void; onDelete?: () => void }) => {
   const { i18n } = useTranslation()
   const lang = i18n.language as 'ja' | 'uz'
   

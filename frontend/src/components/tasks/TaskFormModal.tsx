@@ -25,8 +25,8 @@ const TaskFormModal = ({
 }) => {
   const { t, i18n } = useTranslation()
   const lang = i18n.language as 'ja' | 'uz'
-  const { data: tags = [], refetch } = useQuery({ queryKey: ['tags'], queryFn: fetchTags })
-  const { data: projects = [] } = useQuery({ queryKey: ['projects'], queryFn: fetchProjects })
+  const { data: tags = [], refetch } = useQuery({ queryKey: ['tags'], queryFn: fetchTags, enabled: open })
+  const { data: projects = [] } = useQuery({ queryKey: ['projects'], queryFn: fetchProjects, enabled: open })
   const validTagIds = useMemo(() => new Set(tags.map((tag: any) => tag.id)), [tags])
   const [form, setForm] = useState({
     title_ja: '',
@@ -145,19 +145,27 @@ const TaskFormModal = ({
         <Input placeholder={t('descriptionUz')} value={form.description_uz} onChange={(e) => setForm({ ...form, description_uz: e.target.value })} />
         <Input type="datetime-local" value={form.due_at} onChange={(e) => setForm({ ...form, due_at: e.target.value })} />
         <div className="grid grid-cols-2 gap-3">
-          <Select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
-            <option value="todo">todo</option>
-            <option value="in_progress">in_progress</option>
-            <option value="done">done</option>
-          </Select>
-          <Select value={form.priority} onChange={(e) => setForm({ ...form, priority: e.target.value })}>
-            <option value="low">low</option>
-            <option value="medium">medium</option>
-            <option value="high">high</option>
-          </Select>
+          <Select
+            value={form.status}
+            onChange={(val) => setForm({ ...form, status: val })}
+            options={[
+              { value: 'todo', label: 'todo' },
+              { value: 'in_progress', label: 'in_progress' },
+              { value: 'done', label: 'done' },
+            ]}
+          />
+          <Select
+            value={form.priority}
+            onChange={(val) => setForm({ ...form, priority: val })}
+            options={[
+              { value: 'low', label: 'low' },
+              { value: 'medium', label: 'medium' },
+              { value: 'high', label: 'high' },
+            ]}
+          />
         </div>
         <div className="space-y-2">
-          <div className="text-xs text-gray-500">{t('projects') || 'Projects'}</div>
+          <div className="text-xs text-gray-500">{t('projects')}</div>
           <div className="flex flex-wrap gap-2">
             {projects.map((proj: any) => (
               <label key={proj.id} className="flex items-center gap-2 text-xs">
@@ -180,7 +188,7 @@ const TaskFormModal = ({
           </div>
         </div>
         <div className="space-y-2">
-          <div className="text-xs text-gray-500">Tags</div>
+          <div className="text-xs text-gray-500">{t('tags')}</div>
           <div className="flex flex-wrap gap-2">
             {tags.map((tag: any) => (
               <label key={tag.id} className="flex items-center gap-2 text-xs">
@@ -201,7 +209,7 @@ const TaskFormModal = ({
           </div>
         </div>
         <div className="flex justify-between">
-          <button className="text-sm text-teal" onClick={handleTranslate}>
+          <button type="button" className="text-sm text-teal" onClick={handleTranslate}>
             {t('autoTranslate')}
           </button>
           <div className="flex gap-2">

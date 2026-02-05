@@ -9,7 +9,14 @@ const Register = () => {
   const { t } = useTranslation()
   const { register } = useAuth()
   const navigate = useNavigate()
-  const [form, setForm] = useState({ email: '', password: '', display_name: '' })
+  const [form, setForm] = useState({
+    email: '',
+    password: '',
+    display_name: '',
+    first_name: '',
+    last_name: '',
+    student_id: ''
+  })
   const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -17,6 +24,10 @@ const Register = () => {
     setError('')
     if (!form.email.trim() || !form.password.trim()) {
       setError(t('emailAndPasswordRequired') || 'Email and password are required')
+      return
+    }
+    if (!form.student_id.trim()) {
+      setError(t('studentIdRequired') || 'Student ID is required')
       return
     }
     if (form.password.length < 8) {
@@ -45,6 +56,11 @@ const Register = () => {
         <h1 className="text-2xl font-bold text-ink dark:text-white">{t('register')}</h1>
         {error && <div className="text-sm text-red-500">{error}</div>}
         <Input type="email" placeholder={t('email')} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+        <Input placeholder={t('studentId')} value={form.student_id} onChange={(e) => setForm({ ...form, student_id: e.target.value })} />
+        <div className="grid grid-cols-2 gap-4">
+          <Input placeholder={t('firstName')} value={form.first_name} onChange={(e) => setForm({ ...form, first_name: e.target.value })} />
+          <Input placeholder={t('lastName')} value={form.last_name} onChange={(e) => setForm({ ...form, last_name: e.target.value })} />
+        </div>
         <Input placeholder={t('displayName')} value={form.display_name} onChange={(e) => setForm({ ...form, display_name: e.target.value })} />
         <Input type="password" placeholder={t('password')} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
         <Button type="submit" className="w-full">{t('register')}</Button>

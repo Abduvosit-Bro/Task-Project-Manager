@@ -2,6 +2,7 @@ import Modal from '../ui/Modal'
 import Button from '../ui/Button'
 import { useTranslation } from 'react-i18next'
 import { pickLocalized } from '../../utils/i18nHelpers'
+import { updateMemberStatus } from '../../api/projects'
 
 const NotificationDetailsModal = ({
   open,
@@ -18,6 +19,18 @@ const NotificationDetailsModal = ({
   if (!notification) return null
   const lang = i18n.language as 'ja' | 'uz'
   const entity = notification.entity
+
+  const handleStatusUpdate = async (status: 'active' | 'rejected') => {
+    if (!notification || !notification.entity) return
+    try {
+      await updateMemberStatus(notification.entity.project.id, notification.entity.id, status)
+      onMarkRead()
+      onClose()
+    } catch (error) {
+      console.error(error)
+      alert('Failed to update status')
+    }
+  }
 
   return (
     <Modal title={t('notifications')} open={open} onClose={onClose}>
@@ -73,6 +86,40 @@ const NotificationDetailsModal = ({
               <div>{entity.end_at || '-'}</div>
             </div>
           </div>
+        )}
+        {notification.type === 'join_request' && entity && (
+          <div className="space-y-4 pt-2">
+            <p className="font-medium">
+              {t('joinRequestMessage', {
+                user: entity.user?.display_name || 'User',
+                project: pickLocalized(entity.project, 'name', lang)
+              })}
+            </p>
+            {entity.status === 'pending' ? (
+              <div className="flex gap-2">
+                <Button onClick={() => handleStatusUpdate('active')} className="bg-teal-500 hover:bg-teal-600 text-white">
+                  {t('approve')}
+                </Button>
+                <Button onClick={() => handleStatusUpdate('rejected')} className="bg-red-500 hover:bg-red-600 text-white">
+                  {t('reject')}
+                </Button>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">
+                {t('status')}: {entity.status}
+              </p>
+            )}
+          </div>
+        )}
+        {(notification.type === 'project_join_approved' || notification.type === 'project_join_rejected') && entity && (
+           <div className="space-y-4 pt-2">
+             <p className="font-medium">
+               {notification.type === 'project_join_approved' 
+                 ? t('joinRequestApprovedMessage', { project: pickLocalized(entity, 'name', lang) })
+                 : t('joinRequestRejectedMessage', { project: pickLocalized(entity, 'name', lang) })
+               }
+             </p>
+           </div>
         )}
         <div className="flex justify-end gap-2 pt-2">
           {!notification.is_read && (

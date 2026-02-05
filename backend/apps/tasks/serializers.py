@@ -25,7 +25,7 @@ class TaskSerializer(serializers.ModelSerializer):
             'due_at', 'priority', 'status', 'tags', 'tags_detail',
             'created_at', 'updated_at'
         )
-        read_only_fields = ('id', 'created_by', 'created_at', 'updated_at', 'projects')
+        read_only_fields = ('id', 'created_by', 'created_at', 'updated_at')
         extra_kwargs = {
             'title_ja': {'required': False, 'allow_blank': True},
             'title_uz': {'required': False, 'allow_blank': True},
@@ -39,9 +39,12 @@ class TaskSerializer(serializers.ModelSerializer):
         if request and request.user.is_authenticated:
             # Set queryset to filter tags by owner - this must be done before validation
             self.fields['tags'].queryset = Tag.objects.filter(owner=request.user)
+            # Restrict projects to owned projects
+            self.fields['projects'].queryset = Project.objects.filter(owner=request.user)
         else:
             # If no request or user not authenticated, keep empty queryset
             self.fields['tags'].queryset = Tag.objects.none()
+            self.fields['projects'].queryset = Project.objects.none()
 
     def validate_tags(self, value):
         """Validate that all tags belong to the current user."""
@@ -106,9 +109,12 @@ class TaskSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         tags = validated_data.pop('tags', [])
+        projects = validated_data.pop('projects', [])
         task = Task.objects.create(**validated_data)
         if tags:
             task.tags.set(tags)
+        if projects:
+            task.projects.set(projects)
         return task
 
     def update(self, instance, validated_data):

@@ -37,6 +37,10 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean }
 
+    if (axios.isCancel(error) || error.code === 'ERR_CANCELED' || error.message === 'canceled') {
+      return Promise.reject(error)
+    }
+    
     // If error is 401 and we haven't tried to refresh yet
     if (error.response?.status === 401 && !originalRequest._retry) {
       // Avoid infinite loop: if the failed request is the refresh endpoint, don't try to refresh again
@@ -74,10 +78,17 @@ api.interceptors.response.use(
         }
       } catch (refreshError) {
         processQueue(refreshError as AxiosError, null)
-        // Clear tokens and redirect to login
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('refresh_token')
-        window.location.href = '/login'
+        
+        // Only log out if it's an authentication error (401/403)
+        // If it's a network error or server error (500), just fail the request but keep the session
+        const status = (refreshError as AxiosError).response?.status
+        if (status === 401 || status === 403) {
+          // Clear tokens and redirect to login
+          localStorage.removeItem('access_token')
+          localStorage.removeItem('refresh_token')
+          window.location.href = '/login'
+        }
+        
         return Promise.reject(refreshError)
       } finally {
         isRefreshing = false

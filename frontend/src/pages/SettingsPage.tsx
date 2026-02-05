@@ -72,14 +72,11 @@ const SettingsPage = () => {
         </div>
         <Input placeholder={t('studentId')} value={studentId} onChange={(e) => setStudentId(e.target.value)} />
         <Input placeholder={t('displayName')} value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
-        <Select value={timezone} onChange={(e) => setTimezone(e.target.value)}>
-          {timezones
-            .map((tz) => (
-              <option key={tz} value={tz}>
-                {tz}
-              </option>
-            ))}
-        </Select>
+        <Select
+          value={timezone}
+          onChange={(val) => setTimezone(val)}
+          options={timezones.map((tz: string) => ({ value: tz, label: tz }))}
+        />
         <Button onClick={handleSave}>{t('update')}</Button>
       </div>
       <div className="rounded-2xl bg-white/70 dark:bg-night/70 p-4 space-y-3">
